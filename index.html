@@ -1,196 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventário e Loja</title>
-    <style>
-      /* Estilos personalizados */
-      body {
-        font-family: 'Courier New', monospace;
-        background-color: #000;
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .main-container {
-        width: 90%;
-        max-width: 900px;
-        background-color: #111;
-        margin-top: 30px;
-        padding: 20px;
-        border: 1px solid #fff;
-      }
-
-      h1,
-      h3 {
-        font-family: 'Libre Baskerville', serif;
-        color: #fff;
-        text-transform: uppercase;
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      h1 {
-        font-weight: 700;
-        font-size: 2rem;
-      }
-
-      h3 {
-        font-weight: 700;
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-      }
-
-      .status-bar {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        font-size: 16px;
-      }
-
-      .status-bar span {
-        font-weight: bold;
-      }
-
-      .status-bar .capacity {
-        display: flex;
-        align-items: center;
-      }
-
-      .capacity-box {
-        width: 80px;
-        height: 30px;
-        text-align: center;
-        font-size: 16px;
-        border: 1px solid #fff;
-        background-color: #222;
-        color: #fff;
-        margin-right: 10px;
-      }
-
-      .inventory,
-      .shop {
-        margin-top: 30px;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-      }
-
-      .slot,
-      .item {
-        border: 2px solid #fff;
-        padding: 10px;
-        background-color: #222;
-        text-align: center;
-      }
-
-      .item button,
-      button {
-        font-family: 'Courier New', monospace;
-        margin-top: 10px;
-        padding: 10px 15px;
-        background-color: #555;
-        color: #fff;
-        border: 1px solid #fff;
-        cursor: pointer;
-        text-transform: uppercase;
-      }
-
-      .item button:disabled {
-        background-color: #333;
-        cursor: not-allowed;
-      }
-
-      button:hover {
-        background-color: #777;
-      }
-
-      .category {
-        margin-top: 20px;
-        margin-bottom: 20px;
-      }
-
-      .category h3 {
-        margin-bottom: 10px;
-      }
-
-      input[type="number"] {
-        font-family: 'Courier New', monospace;
-        padding: 5px;
-        width: 80px;
-        border: 1px solid #fff;
-        background-color: #000;
-        color: #fff;
-      }
-
-      #money {
-        font-size: 1.2rem;
-        font-weight: bold;
-      }
-
-      .quantity {
-        font-size: 1rem;
-        font-weight: bold;
-        color: #fff;
-      }
-
-      .weight {
-        font-size: 0.9rem;
-        color: #bbb;
-      }
-
-      .error-message {
-        color: red;
-        font-weight: bold;
-        margin-top: 10px;
-        text-align: center;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="main-container">
-      <h1>lojaㅤ&ㅤ inventário</h1>
-      <div class="status-bar">
-        <div>Dinheiro: <span id="money">$400</span>
-        </div>
-        <div>Peso Atual: <span id="current-weight">0kg</span>
-        </div>
-        <div class="capacity">
-          <div class="capacity-box" id="weight-capacity">0</div>
-          <span>kg</span>
-        </div>
-      </div>
-      <div class="calculator" style="margin-bottom: 30px;">
-        <div>
-          <label for="strength">Força:</label>
-          <input type="number" id="strength" value="0">
-        </div>
-        <div>
-          <label for="size">Tamanho:</label>
-          <input type="number" id="size" value="0">
-        </div>
-        <button onclick="calculateCapacity()">Calcular</button>
-      </div>
-      <div id="error-message" class="error-message"></div>
-      <div class="inventory">
-        <h3>Inventário</h3>
-        <div class="grid" id="inventory-slots"></div>
-      </div>
-      <div class="shop">
-        <h3>Loja</h3>
-        <div id="shop-categories"></div>
-      </div>
-    </div>
-    <script>
-      let money = parseInt(localStorage.getItem('money')) || 400;
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inventário e Loja</title><style>body{font-family:'Courier New',monospace;background-color:#000;color:#fff;margin:0;padding:0;display:flex;flex-direction:column;align-items:center}.main-container{width:90%;max-width:900px;background-color:#111;margin-top:30px;padding:20px;border:1px solid #fff}h1,h3{font-family:'Libre Baskerville',serif;color:#fff;text-transform:uppercase;text-align:center;margin-bottom:20px}h1{font-weight:700;font-size:2rem}h3{font-weight:700;font-size:1.5rem;margin-bottom:10px}.status-bar{display:flex;justify-content:space-between;margin-bottom:20px;font-size:16px}.status-bar span{font-weight:700}.status-bar .capacity{display:flex;align-items:center}.capacity-box{width:80px;height:30px;text-align:center;font-size:16px;border:1px solid #fff;background-color:#222;color:#fff;margin-right:10px}.inventory,.shop{margin-top:30px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.item,.slot{border:2px solid #fff;padding:10px;background-color:#222;text-align:center}.item button,button{font-family:'Courier New',monospace;margin-top:10px;padding:10px 15px;background-color:#555;color:#fff;border:1px solid #fff;cursor:pointer;text-transform:uppercase}.item button:disabled{background-color:#333;cursor:not-allowed}button:hover{background-color:#777}.category{margin-top:20px;margin-bottom:20px}.category h3{margin-bottom:10px}input[type=number]{font-family:'Courier New',monospace;padding:5px;width:80px;border:1px solid #fff;background-color:#000;color:#fff}#money{font-size:1.2rem;font-weight:700}.quantity{font-size:1rem;font-weight:700;color:#fff}.weight{font-size:.9rem;color:#bbb}.error-message{color:red;font-weight:700;margin-top:10px;text-align:center}</style></head><body><div class="main-container"><h1>lojaㅤ&ㅤ inventário</h1><div class="status-bar"><div>Dinheiro:<span id="money">$400</span></div><div>Peso Atual:<span id="current-weight">0kg</span></div><div class="capacity"><div class="capacity-box" id="weight-capacity">0</div><span>kg</span></div></div><div class="calculator" style="margin-bottom:30px"><div><label for="strength">Força:</label><input type="number" id="strength" value="0"></div><div><label for="size">Tamanho:</label><input type="number" id="size" value="0"></div><button onclick="calculateCapacity()">Calcular</button></div><div id="error-message" class="error-message"></div><div class="inventory"><h3>Inventário</h3><div class="grid" id="inventory-slots"></div></div><div class="shop"><h3>Loja</h3><div id="shop-categories"></div></div></div><script>let money = parseInt(localStorage.getItem('money')) || 400;
       let weightCapacity = 0;
       let currentWeight = 0;
       let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
@@ -201,11 +9,11 @@
           "price": 15,
           "weight": 2
         }, {
-          "name": "Máquina de escrever portátil",
+          "name": "Máquina de escrever",
           "price": 50,
           "weight": 6
         }, {
-          "name": "Gravador de fita magnética",
+          "name": "Gravador de fita",
           "price": 60,
           "weight": 4
         }, {
@@ -221,7 +29,7 @@
           "price": 20,
           "weight": 1
         }, {
-          "name": "Câmera Polaroid",
+          "name": "Câmera instantânea",
           "price": 90,
           "weight": 3
         }, {
@@ -238,7 +46,7 @@
           "price": 4,
           "weight": 3
         }, {
-          "name": "Chave inglesa ajustável",
+          "name": "Chave inglesa",
           "price": 3,
           "weight": 2
         }, {
@@ -254,7 +62,7 @@
           "price": 15,
           "weight": 4
         }, {
-          "name": "Mochila de lona militar",
+          "name": "Mochila de lona",
           "price": 12,
           "weight": 2
         }, {
@@ -266,7 +74,7 @@
           "price": 3,
           "weight": 1
         }, {
-          "name": "Serrote",
+          "name": "Serrote manual",
           "price": 6,
           "weight": 3
         }, {
@@ -307,7 +115,7 @@
           "price": 25,
           "weight": 2
         }, {
-          "name": "Cachimbo de madeira",
+          "name": "Cachimbo",
           "price": 5,
           "weight": 1
         }, {
@@ -327,7 +135,7 @@
           "price": 3,
           "weight": 1
         }, {
-          "name": "Termômetro de mercúrio",
+          "name": "Termômetro",
           "price": 2,
           "weight": 0.3
         }, {
@@ -343,7 +151,7 @@
           "price": 6,
           "weight": 0.8
         }, {
-          "name": "Papel fotográfico para Polaroid",
+          "name": "Papel fotográfico",
           "price": 8,
           "weight": 1
         }, {
@@ -380,7 +188,7 @@
           "price": 3,
           "weight": 0.2
         }, {
-          "name": "Pente de bolso em madrepérola",
+          "name": "Pente de bolso",
           "price": 2,
           "weight": 0.2
         }],
@@ -397,7 +205,7 @@
           "price": 3,
           "weight": 0.2
         }, {
-          "name": "Blusa de lã com zíper",
+          "name": "Blusa de lã",
           "price": 8,
           "weight": 1
         }, {
@@ -409,12 +217,12 @@
           "price": 4,
           "weight": 0.5
         }]
-      }
+      };
 
       function calculateCapacity() {
         const strength = parseInt(document.getElementById("strength").value);
         const size = parseInt(document.getElementById("size").value);
-        weightCapacity = Math.ceil((strength + size) / 2); // Ajustado para cálculo lógico.
+        weightCapacity = Math.ceil((strength + size) / 14);
         document.getElementById("weight-capacity").innerText = weightCapacity;
       }
 
@@ -426,13 +234,15 @@
           slot.className = 'slot';
           const quantity = itemQuantities[item.name] || 0;
           slot.innerHTML = `
-                    
+               
 							<strong>${item.name}</strong>
 							<br>
-                    Quantidade: ${quantity}
+               Quantidade: ${quantity}
 								<br>
-                    Peso: ${item.weight}kg
-                `;
+               Peso: ${item.weight}kg
+									<br>
+										<button onclick="removeItem('${item.name}', ${item.price}, ${item.weight})">Remover</button>
+             `;
           inventorySlots.appendChild(slot);
         });
         document.getElementById("current-weight").innerText = `${currentWeight.toFixed(2)}kg`;
@@ -465,6 +275,26 @@
         updateUI();
       }
 
+      function removeItem(itemName, price, weight) {
+        if (itemQuantities[itemName] > 0) {
+          itemQuantities[itemName]--;
+          currentWeight -= weight;
+          // Verificando se o preço é um número válido antes de adicionar ao dinheiro
+          if (typeof price === 'number' && !isNaN(price)) {
+            money += price; // Devolvendo o dinheiro ao usuário
+          }
+          if (itemQuantities[itemName] === 0) {
+            inventory = inventory.filter(item => item.name !== itemName);
+          }
+          // Salvando as atualizações no localStorage
+          localStorage.setItem('money', money);
+          localStorage.setItem('inventory', JSON.stringify(inventory));
+          localStorage.setItem('itemQuantities', JSON.stringify(itemQuantities));
+          // Atualizando a interface do usuário
+          updateUI();
+        }
+      }
+
       function createShop() {
         const shopCategories = document.getElementById("shop-categories");
         shopCategories.innerHTML = '';
@@ -480,15 +310,15 @@
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item';
             itemDiv.innerHTML = `
-                        
-									<strong>${item.name}</strong>
-									<br>
-                        Preço: $${item.price}
+                 
+										<strong>${item.name}</strong>
 										<br>
-                        Peso: ${item.weight}kg
+                 Preço: $${item.price}
 											<br>
-												<button onclick="buyItem('${item.name}', ${item.price}, ${item.weight})">Comprar</button>
-                    `;
+                 Peso: ${item.weight}kg
+												<br>
+													<button onclick="buyItem('${item.name}', ${item.price}, ${item.weight})">Comprar</button>
+               `;
             grid.appendChild(itemDiv);
           });
           categoryDiv.appendChild(grid);
@@ -498,7 +328,4 @@
       window.onload = () => {
         updateUI();
         createShop();
-      };
-    </script>
-  </body>
-</html>
+      };</script></body></html>
