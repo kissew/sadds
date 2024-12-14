@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventário e Loja</title>
+    <style>
+      /* Estilos personalizados */
+      body {
+        font-family: 'Courier New', monospace;
+        background-color: #000;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .main-container {
+        width: 90%;
+        max-width: 900px;
+        background-color: #111;
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #fff;
+      }
+
+      h1,
+      h3 {
+        font-family: 'Libre Baskerville', serif;
+        color: #fff;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-weight: 700;
+        font-size: 2rem;
+      }
+
+      h3 {
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .status-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+
+      .status-bar span {
+        font-weight: bold;
+      }
+
+      .status-bar .capacity {
+        display: flex;
+        align-items: center;
+      }
+
+      .capacity-box {
+        width: 80px;
+        height: 30px;
+        text-align: center;
+        font-size: 16px;
+        border: 1px solid #fff;
+        background-color: #222;
+        color: #fff;
+        margin-right: 10px;
+      }
+
+      .inventory,
+      .shop {
+        margin-top: 30px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .slot,
+      .item {
+        border: 2px solid #fff;
+        padding: 10px;
+        background-color: #222;
+        text-align: center;
+      }
+
+      .item button,
+      button {
+        font-family: 'Courier New', monospace;
+        margin-top: 10px;
+        padding: 10px 15px;
+        background-color: #555;
+        color: #fff;
+        border: 1px solid #fff;
+        cursor: pointer;
+        text-transform: uppercase;
+      }
+
+      .item button:disabled {
+        background-color: #333;
+        cursor: not-allowed;
+      }
+
+      button:hover {
+        background-color: #777;
+      }
+
+      .category {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .category h3 {
+        margin-bottom: 10px;
+      }
+
+      input[type="number"] {
+        font-family: 'Courier New', monospace;
+        padding: 5px;
+        width: 80px;
+        border: 1px solid #fff;
+        background-color: #000;
+        color: #fff;
+      }
+
+      #money {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .quantity {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .weight {
+        font-size: 0.9rem;
+        color: #bbb;
+      }
+
+      .error-message {
+        color: red;
+        font-weight: bold;
+        margin-top: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <h1>lojaㅤ&ㅤ inventário</h1>
+      <div class="status-bar">
+        <div>Dinheiro: <span id="money">$400</span>
+        </div>
+        <div>Peso Atual: <span id="current-weight">0kg</span>
+        </div>
+        <div class="capacity">
+          <div class="capacity-box" id="weight-capacity">0</div>
+          <span>kg</span>
+        </div>
+      </div>
+      <div class="calculator" style="margin-bottom: 30px;">
+        <div>
+          <label for="strength">Força:</label>
+          <input type="number" id="strength" value="0">
+        </div>
+        <div>
+          <label for="size">Tamanho:</label>
+          <input type="number" id="size" value="0">
+        </div>
+        <button onclick="calculateCapacity()">Calcular</button>
+      </div>
+      <div id="error-message" class="error-message"></div>
+      <div class="inventory">
+        <h3>Inventário</h3>
+        <div class="grid" id="inventory-slots"></div>
+      </div>
+      <div class="shop">
+        <h3>Loja</h3>
+        <div id="shop-categories"></div>
+      </div>
+    </div>
+    <script>
+      let money = parseInt(localStorage.getItem('money')) || 400;
+      let weightCapacity = 0;
+      let currentWeight = 0;
+      let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      let itemQuantities = JSON.parse(localStorage.getItem('itemQuantities')) || {};
+      const categories = {
+        "Telecomunicações": [{
+          "name": "Rádio portátil",
+          "price": 15,
+          "weight": 2
+        }, {
+          "name": "Máquina de escrever portátil",
+          "price": 50,
+          "weight": 6
+        }, {
+          "name": "Gravador de fita magnética",
+          "price": 60,
+          "weight": 4
+        }, {
+          "name": "Walkie-talkie",
+          "price": 45,
+          "weight": 3
+        }, {
+          "name": "Calculadora mecânica",
+          "price": 125,
+          "weight": 1
+        }, {
+          "name": "Rádio transistorizado",
+          "price": 20,
+          "weight": 1
+        }, {
+          "name": "Câmera Polaroid",
+          "price": 90,
+          "weight": 3
+        }, {
+          "name": "Lanterna",
+          "price": 3,
+          "weight": 1
+        }, {
+          "name": "Gramofone portátil",
+          "price": 45,
+          "weight": 8
+        }],
+        "Ferramentas": [{
+          "name": "Martelo de carpinteiro",
+          "price": 4,
+          "weight": 3
+        }, {
+          "name": "Chave inglesa ajustável",
+          "price": 3,
+          "weight": 2
+        }, {
+          "name": "Faca de sobrevivência",
+          "price": 10,
+          "weight": 1
+        }, {
+          "name": "Régua de cálculo",
+          "price": 20,
+          "weight": 2
+        }, {
+          "name": "Saco de dormir",
+          "price": 15,
+          "weight": 4
+        }, {
+          "name": "Mochila de lona militar",
+          "price": 12,
+          "weight": 2
+        }, {
+          "name": "Bússola",
+          "price": 5,
+          "weight": 1
+        }, {
+          "name": "Fita métrica",
+          "price": 3,
+          "weight": 1
+        }, {
+          "name": "Serrote",
+          "price": 6,
+          "weight": 3
+        }, {
+          "name": "Alicate",
+          "price": 4,
+          "weight": 1
+        }, {
+          "name": "Lupa",
+          "price": 2,
+          "weight": 0.5
+        }, {
+          "name": "Pé de cabra",
+          "price": 7,
+          "weight": 5
+        }, {
+          "name": "Máscara de gás",
+          "price": 25,
+          "weight": 2
+        }, {
+          "name": "Canivete suíço",
+          "price": 5,
+          "weight": 0.5
+        }],
+        "Itens Diversos": [{
+          "name": "Kit de primeiros socorros",
+          "price": 10,
+          "weight": 2
+        }, {
+          "name": "Caderno de anotações",
+          "price": 2,
+          "weight": 0.5
+        }, {
+          "name": "Mochila de couro",
+          "price": 20,
+          "weight": 4
+        }, {
+          "name": "Binóculos",
+          "price": 25,
+          "weight": 2
+        }, {
+          "name": "Cachimbo de madeira",
+          "price": 5,
+          "weight": 1
+        }, {
+          "name": "Relógio de bolso",
+          "price": 12,
+          "weight": 1
+        }, {
+          "name": "Jogo de cartas",
+          "price": 1,
+          "weight": 0.2
+        }, {
+          "name": "Caixa de fósforos",
+          "price": 2,
+          "weight": 0.1
+        }, {
+          "name": "Cordas de nylon",
+          "price": 3,
+          "weight": 1
+        }, {
+          "name": "Termômetro de mercúrio",
+          "price": 2,
+          "weight": 0.3
+        }, {
+          "name": "Rolo de filme 35mm",
+          "price": 2,
+          "weight": 0.5
+        }, {
+          "name": "Ábaco",
+          "price": 3,
+          "weight": 1
+        }, {
+          "name": "Bandeira náutica",
+          "price": 6,
+          "weight": 0.8
+        }, {
+          "name": "Papel fotográfico para Polaroid",
+          "price": 8,
+          "weight": 1
+        }, {
+          "name": "Cantil de metal",
+          "price": 6,
+          "weight": 0.5
+        }],
+        "Itens Femininos": [{
+          "name": "Espelho de bolso",
+          "price": 2,
+          "weight": 0.3
+        }, {
+          "name": "Estojo de maquiagem",
+          "price": 5,
+          "weight": 1
+        }, {
+          "name": "Colar de pérolas",
+          "price": 10,
+          "weight": 0.2
+        }, {
+          "name": "Cachecol de seda",
+          "price": 4,
+          "weight": 0.3
+        }, {
+          "name": "Chapéu de aba larga",
+          "price": 8,
+          "weight": 1
+        }, {
+          "name": "Bolsa de mão",
+          "price": 15,
+          "weight": 1
+        }, {
+          "name": "Luvas de cetim",
+          "price": 3,
+          "weight": 0.2
+        }, {
+          "name": "Pente de bolso em madrepérola",
+          "price": 2,
+          "weight": 0.2
+        }],
+        "Itens Masculinos": [{
+          "name": "Relógio de pulso",
+          "price": 15,
+          "weight": 1
+        }, {
+          "name": "Carteira de couro",
+          "price": 7,
+          "weight": 0.5
+        }, {
+          "name": "Chaveiro multiferramenta",
+          "price": 3,
+          "weight": 0.2
+        }, {
+          "name": "Blusa de lã com zíper",
+          "price": 8,
+          "weight": 1
+        }, {
+          "name": "Bolsa carteiro",
+          "price": 10,
+          "weight": 1
+        }, {
+          "name": "Isqueiro de metal",
+          "price": 4,
+          "weight": 0.5
+        }]
+      }
+
+      function calculateCapacity() {
+        const strength = parseInt(document.getElementById("strength").value);
+        const size = parseInt(document.getElementById("size").value);
+        weightCapacity = Math.ceil((strength + size) / 2); // Ajustado para cálculo lógico.
+        document.getElementById("weight-capacity").innerText = weightCapacity;
+      }
+
+      function updateUI() {
+        const inventorySlots = document.getElementById("inventory-slots");
+        inventorySlots.innerHTML = '';
+        inventory.forEach((item) => {
+          const slot = document.createElement('div');
+          slot.className = 'slot';
+          const quantity = itemQuantities[item.name] || 0;
+          slot.innerHTML = `
+                    
+							<strong>${item.name}</strong>
+							<br>
+                    Quantidade: ${quantity}
+								<br>
+                    Peso: ${item.weight}kg
+                `;
+          inventorySlots.appendChild(slot);
+        });
+        document.getElementById("current-weight").innerText = `${currentWeight.toFixed(2)}kg`;
+        document.getElementById("money").innerText = `$${money}`;
+      }
+
+      function buyItem(itemName, price, weight) {
+        const errorMessage = document.getElementById("error-message");
+        errorMessage.innerText = '';
+        if (currentWeight + weight > weightCapacity) {
+          errorMessage.innerText = "Você excedeu a capacidade de peso!";
+          return;
+        }
+        if (money < price) {
+          errorMessage.innerText = "Dinheiro insuficiente!";
+          return;
+        }
+        money -= price;
+        currentWeight += weight;
+        if (!inventory.some(item => item.name === itemName)) {
+          inventory.push({
+            name: itemName,
+            weight
+          });
+        }
+        itemQuantities[itemName] = (itemQuantities[itemName] || 0) + 1;
+        localStorage.setItem('money', money);
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+        localStorage.setItem('itemQuantities', JSON.stringify(itemQuantities));
+        updateUI();
+      }
+
+      function createShop() {
+        const shopCategories = document.getElementById("shop-categories");
+        shopCategories.innerHTML = '';
+        Object.keys(categories).forEach(category => {
+          const categoryDiv = document.createElement('div');
+          categoryDiv.className = 'category';
+          const categoryTitle = document.createElement('h3');
+          categoryTitle.innerText = category || 'Diversos';
+          categoryDiv.appendChild(categoryTitle);
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+          categories[category].forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            itemDiv.innerHTML = `
+                        
+									<strong>${item.name}</strong>
+									<br>
+                        Preço: $${item.price}
+										<br>
+                        Peso: ${item.weight}kg
+											<br>
+												<button onclick="buyItem('${item.name}', ${item.price}, ${item.weight})">Comprar</button>
+                    `;
+            grid.appendChild(itemDiv);
+          });
+          categoryDiv.appendChild(grid);
+          shopCategories.appendChild(categoryDiv);
+        });
+      }
+      window.onload = () => {
+        updateUI();
+        createShop();
+      };
+    </script>
+  </body>
+</html>
